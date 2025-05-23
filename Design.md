@@ -26,10 +26,10 @@ boss again. The player will not change the direction they are facing
 
 ### Stats
 Here is the list of stats that can be improved, plus what they do:
-| Stat name     | Function              |
-|---------------|-----------------------|
-| Health        | The player's HP       |
-| 
+| Stat name     | Function                    |
+|---------------|-----------------------------|
+| Health        | The player's HP             |
+| Speed         | The player's movement speed |
 
 ## Inpsiration
 - SoulsBorne series
