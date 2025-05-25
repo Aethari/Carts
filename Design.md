@@ -34,6 +34,8 @@ Here is the list of stats that can be improved, plus what they do:
 ## Inpsiration
 - SoulsBorne series
 - Zelda series
+- Undertale
+- Nodebuster (for design)
 
 ## Genre(s)
 Soulslike, rogulike
