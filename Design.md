@@ -14,31 +14,30 @@ Cart: [souls.p8](souls.p8)
 ## Game Summary
 The player spawns in an arena. After a few seconds, a boss appears and
 begins to fight the player. The boss has a variety of attacks, and a
-health bar. The player can attack the boss by swinging a sword (like a
-Zelda game). Once the player defeats the boss (or dies), they get a
-score based on their performance. Then the player earns XP based on
-their score. XP is persistant across runs, but it lost when the player
-dies to a boss. After the fight is over, the player can spend XP on a
-variety of stat upgrades to help their fight. Each upgrade goes up in
-cost when bought. After upgrading (or not), the player can fight the
-boss again. The player will not change the direction they are facing
-(up), unless they are rolling.
+health bar. The player can attack the boss by spawning friendly blue
+cubes, which deal damage when they collide with the boss. Once the player 
+defeats the boss (or dies), they get a score based on their performance.
+Then the player earns XP based on their score. After the fight is over, 
+the player can spend XP on a variety of stat upgrades to help their fight.
+Each upgrade goes up in cost when bought. After upgrading (or not), the 
+player can fight the boss again.
 
 ### Stats
 Here is the list of stats that can be improved, plus what they do:
-| Stat name     | Function                    |
-|---------------|-----------------------------|
-| Health        | The player's HP             |
-| Speed         | The player's movement speed |
+| Stat name     | Function                    				|
+|---------------|-------------------------------------------|
+| Health        | The player's HP             				|
+| Mana			| The player's mana							|
+| Speed         | The player's movement speed 				|
+| Friends		| The # of friendly cubes the player spawns |
+| Damage		| The amount of damage a friendly cube does |
 
-## Inpsiration
-- SoulsBorne series
-- Zelda series
+## Inpsirations
 - Undertale
-- Nodebuster (for design)
+- Nodebuster
 
 ## Genre(s)
-Soulslike, rogulike
+Incremental, survival
 
 ## Gameplay
 The player controls a single sprite character, which uses "real"
@@ -49,10 +48,10 @@ health reaches 0, they die.
 
 ### Mechanics
 - Movement: Do I even need to tell you what this is?
-- Rolling: The player can roll as a supplement for movement, making
-		   them invincible for the duration
-- Attacking: The player can use the x key to attack, swinging their
-			 sword in a wide arc
+- Invincibility: The player can cast an invincibility spell at the
+				 cost of mana, which regens over time
+- Spawning: Every 10 seconds, the player spanws friendly blue cubes
+			that do damage to the boss when they collide with it
 - XP: I told you about XP in the game summary
 
 ## Art
