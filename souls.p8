@@ -6,21 +6,11 @@ __lua__
 
 --[[
 todo:
-- add a timer (5s countdown?)
-  before anything can update
-  in the _update function
-- find a way to telegraph which
-  attack will be used (draw in
-  gray several frames before
-  turning red)?
 - make a "quit run" menu item
   which takes the player back
   to the main menu
 - add a screen shake when the
   player is hit
-- make the player's inv bar
-  (when they get hit) go
-  backwards instead of forwards
 
 other notes:
 - for boss damage, just check
@@ -32,6 +22,13 @@ future improvements:
   regain health
 - remove the corners on the
   bars?
+- find a way to telegraph which
+  attack will be used (draw in
+  gray several frames before
+  turning red)?
+- make the player's inv bar
+  (when they get hit) go
+  backwards instead of forwards
 ]]
 
 -- general functions
@@ -47,6 +44,80 @@ end
 -- between l and h
 function randr(l,h)
 	return flr(rnd(h-l))+l
+end
+
+-- saving/loading
+function save()
+	dset(0,p.hiscore)
+	dset(1,p.xp)
+	
+	dset(2,p.maxspeed)
+	dset(3,p.mhp)
+	dset(4,p.mst)
+	dset(5,p.fc)
+	dset(6,p.dmg)
+	
+	dset(7,p.hpcost)
+	dset(8,p.stcost)
+	dset(9,p.spdcost)
+	dset(10,p.fccost)
+	dset(11,p.dmgcost)
+end
+
+function load()
+	p.hiscore = dget(0)
+	p.xp = dget(1)
+	
+	p.maxspeed = dget(2)
+	p.mhp = dget(3)
+	p.mst = dget(4)
+	p.fc = dget(5)
+	p.dmg = dget(6)
+	
+	p.hpcost = dget(7)
+	p.stcost = dget(8)
+	p.spdcost = dget(9)
+	p.fccost = dget(10)
+	p.dmgcost = dget(11)
+end
+
+-- formats all save data
+function format()
+	for i = 0, 63 do
+		-- costs
+		if i >= 7 and i <= 11 then
+			dset(i,2)
+		else
+			dset(i,0)
+		end
+	end
+	dset(1,2)
+	dset(2,.8)
+	dset(3,15)
+	dset(4,10)
+	dset(5,3)
+	dset(6,3)
+	
+	load()
+	
+	m.u = true
+	m.d = true
+end
+
+-- go back to the menu
+function quit()
+	p.score -= 25
+	
+	if p.score > p.hiscore then
+		p.hiscore = p.score
+	end
+	
+	p.xp += p.score/2
+
+	save()
+
+	m.u = true
+	m.d = true
 end
 
 -- instance management
@@ -143,6 +214,8 @@ p = {
 	dx = 0,
 	dy = 0,
 	
+	hiscore = 0,
+	score = 0,
 	xp = 2,
 
 	col = 11,
@@ -164,12 +237,20 @@ p = {
 	-- friend count
 	fc = 3,
 	
-	dmg = 5
+	dmg = 3,
+	
+	-- costs to level up stats
+	hpcost = 2,
+	stcost = 2,
+	spdcost = 2,
+	fccost = 2,
+	dmgcost = 2
 }
 
 -- when the player is hit
 function p.hit()
 	p.hp -= 1
+	p.score -= 2	
 	
 	-- provide 2 seconds of
 	-- invincibility
@@ -192,6 +273,18 @@ function p.spawnfriends()
 end
 
 function p.death()
+	p.score -= 25
+	
+	if p.score > p.hiscore then
+		p.hiscore = p.score
+	end
+	
+	p.xp += p.score/2
+	
+	save()
+	
+	m.u = true
+	m.d = true
 end
 
 function p.draw()
@@ -347,6 +440,18 @@ b = {
 }
 
 function b.death()
+	p.score += 100
+	
+	if p.score > p.hiscore then
+		p.score = p.hiscore
+	end
+	
+	p.xp += p.score/2
+	
+	save()
+	
+	m.u = true
+	m.d = true
 end
 
 function b.draw()
@@ -406,7 +511,7 @@ function b.update()
 			b.atk = false
 			b.atktimer = 0
 		elseif rand < .5 then
-			b.timermax = 64
+			b.timermax = 72
 			
 			b.atkpos = randr(
 				p.y-16,
@@ -419,7 +524,7 @@ function b.update()
 			b.atk = false
 			b.atktimer = 0
 		elseif rand < .7 then
-			b.timermax = 64
+			b.timermax = 72
 			
 			b.atkpos = randr(
 				p.y-16,
@@ -437,7 +542,7 @@ function b.update()
 			b.atk = false
 			b.atktimer = 0
 		elseif rand < .9 then
-			b.timermax = 64
+			b.timermax = 72
 			local cnt = randr(2,4)
 			
 			lasers = {}
@@ -455,7 +560,7 @@ function b.update()
 			b.atk = false
 			b.atktimer = 0
 		elseif rand < 1 then
-			b.timermax = 64
+			b.timermax = 72
 			
 			local cnt = randr(1,3)
 			
@@ -537,6 +642,7 @@ function b.update()
 					b.col = 5
 					b.invtimer = 0
 					b.runinvtimer = true
+					p.score += 4
 					break
 				end
 				if hit then break end
@@ -563,23 +669,54 @@ function m.update()
 	if btnp(2) then
 		if m.pos > 1 then
 			m.pos -= 1
+		else
+			m.pos = m.itemcount
 		end
 	elseif btnp(3) then
 		if m.pos < m.itemcount then
 			m.pos += 1
+		else
+			m.pos = 1
 		end
 	end
 	
 	-- select
 	if btnp(4) or btnp(5) then
 		if m.pos == 1 then
+			if p.xp >= p.hpcost then
+				p.mhp += 1
+				p.xp -= p.hpcost
+				p.hpcost *= 1.5
+			end
 		elseif m.pos == 2 then
+			if p.xp >= p.stcost then
+				p.mst += 1
+				p.xp -= p.stcost
+				p.stcost *= 1.5
+			end
 		elseif m.pos == 3 then
+			if p.xp >= p.spdcost then
+				p.maxspeed += .05
+				p.xp -= p.spdcost
+				p.spdcost *= 1.5
+			end
 		elseif m.pos == 4 then
+			if p.xp >= p.fccost then
+				p.fc += 1
+				p.xp -= p.fccost
+				p.fccost *= 1.5
+			end
 		elseif m.pos == 5 then
+			if p.xp >= p.dmgcost then
+				p.dmg += 1
+				p.xp -= p.dmgcost
+				p.dmgcost *= 1.5
+			end
 		elseif 
 			m.pos == m.itemcount
 		then
+			p.hp = p.mhp
+			p.score = 0
 			m.u = false
 			m.d = false
 		end
@@ -592,49 +729,42 @@ function m.draw()
 	-- logo
 	spr(77,52,5,3,3)
 	
+	-- hiscore display
+	local out = "hiscore:"..p.hiscore
+	?out,64-#out*2,31,7
+	
+	-- score display
+	out = "score:"..p.score
+	?out,64-#out*2,38,7
+	
 	-- xp display
-	local out = "xp:"..p.xp
-	?out,64-#out*2,44,7
+	out = "xp:"..p.xp
+	?out,64-#out*2,45,7
 	
 	-- health option
 	?"♥",24,54,8
-	rect(34,54,94,58,7)
-	pset(34,54,0)
-	pset(34,58,0)
-	pset(94,54,0)
-	pset(94,58,0)
+	local out = "cost:"..p.hpcost
+	?out,64-#out*2,54,8
 	
 	-- mana option
 	?"✽",24,66,12
-	rect(34,66,94,70,7)
-	pset(34,66,0)
-	pset(34,70,0)
-	pset(94,66,0)
-	pset(94,70,0)
+	out = "cost:"..p.stcost
+	?out,64-#out*2,66,12
 	
 	-- speed option
 	?"speed",11,78,10
-	rect(34,78,94,82,7)
-	pset(34,78,0)
-	pset(34,82,0)
-	pset(94,78,0)
-	pset(94,82,0)
+	out = "cost:"..p.spdcost
+	?out,64-#out*2,78,10
 	
 	-- friends option
 	?"friends",3,90,11
-	rect(34,90,94,94,7)
-	pset(34,90,0)
-	pset(34,94,0)
-	pset(94,90,0)
-	pset(94,94,0)
+	out = "cost:"..p.fccost
+	?out,64-#out*2,90,11
 	
 	-- damage option
 	?"dmg",19,102,9
-	rect(34,102,94,106,7)
-	pset(34,102,0)
-	pset(34,106,0)
-	pset(94,102,0)
-	pset(94,106,0)
+	out = "cost:"..p.dmgcost
+	?out,64-#out*2,102,9
 	
 	-- empty dot after lvl option
 	spr(76,98,53)
@@ -668,13 +798,23 @@ function m.draw()
 	pset(76,116,0)
 	pset(76,126,0)
 	
+	--[[
+	debug - center x and y
 	line(64,0,64,128,8)
 	line(0,64,128,64,8)
+	]]
 end
 
 -->8
 -- pico functions
 function _init()
+	cartdata("aethari_souls_0_0")
+
+	load()
+		
+	menuitem(2,"quit",quit)
+	menuitem(3,"delete save",format)
+	
 	music(00)
 end
 
@@ -712,6 +852,13 @@ end
 
 function drawgame()
 	cls(0)
+	
+	-- this is here to avoid
+	-- visual bugs which appeared
+	-- in the update loop
+	if p.score <= 0 then
+		p.score = 0
+	end
 
 	map(0,0,0,0,17,17)
 
@@ -789,19 +936,23 @@ function drawgame()
 		7
 	)
 	
-	-- draw health
+	-- health
 	?"♥",0,2,7
 	if p.hp > 0 then
 		rectfill(8,2,p.hp+8,6,8)
 	end
 	rect(7,2,p.mhp+9,6,7)
 	
-	-- draw stamina
+	-- stamina
 	?"✽",0,10,7
 	if p.st > 0 then
 		rectfill(7,10,p.st+7,14,12)
 	end
 	rect(7,10,p.mst+7,14,7)
+	
+	-- score
+	local out = "score:"..p.score
+	?out,128-#out*5,2
 end
 
 function _update60()
