@@ -273,7 +273,7 @@ function p.spawnfriends()
 end
 
 function p.death()
-	p.score -= 25
+	p.score -= 5
 	
 	if p.score > p.hiscore then
 		p.hiscore = p.score
