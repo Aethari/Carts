@@ -8,9 +8,6 @@ outline a game's focus and design.
 # 1. Untitled soulslike game
 Cart: [souls.p8](souls.p8)
 
-### Name Ideas
-- 
-
 ## Game Summary
 The player spawns in an arena. After a few seconds, a boss appears and
 begins to fight the player. The boss has a variety of attacks, and a

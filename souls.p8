@@ -11,10 +11,6 @@ notes:
   originally planned to be
   stamina
 
-todo:
-- add a screen shake when the
-  player is hit
-
 future improvements:
 - add a way for the player to
   regain health
@@ -32,6 +28,8 @@ future improvements:
   the player's general direction
   - use an offset so that it is
   dodgeable
+- add a screen shake when the
+  player is hit
 ]]
 
 -- general functions
