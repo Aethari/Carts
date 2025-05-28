@@ -5,23 +5,21 @@ __lua__
 -- 2025 AETHARI
 
 --[[
+notes:
+- st (p.st) means stamina -
+  instead of mana, it was
+  originally planned to be
+  stamina
+
 todo:
-- make a "quit run" menu item
-  which takes the player back
-  to the main menu
 - add a screen shake when the
   player is hit
-
-other notes:
-- for boss damage, just check
-  for collision with blue 
-  pixels
 
 future improvements:
 - add a way for the player to
   regain health
 - remove the corners on the
-  bars?
+  bars (in game)?
 - find a way to telegraph which
   attack will be used (draw in
   gray several frames before
@@ -29,6 +27,11 @@ future improvements:
 - make the player's inv bar
   (when they get hit) go
   backwards instead of forwards
+- add a new boss attack where
+  the boss shoots a laser in
+  the player's general direction
+  - use an offset so that it is
+  dodgeable
 ]]
 
 -- general functions
@@ -112,19 +115,25 @@ function quit()
 		p.hiscore = p.score
 	end
 	
-	p.xp += p.score/2
+	if p.score < 0 then
+		p.score = 0
+	end
+	
+	p.xp += p.score
 
 	save()
 
 	m.u = true
 	m.d = true
+	
+	m.pos = 1
 end
 
 -- instance management
 cubes = {}
 
 -- friend spawning timer
-ftmax = 540
+ftmax = 480
 ft = ftmax
 
 -->8
@@ -216,7 +225,7 @@ p = {
 	
 	hiscore = 0,
 	score = 0,
-	xp = 2,
+	xp = 4,
 
 	col = 11,
 	inv = false,
@@ -249,7 +258,7 @@ p = {
 
 -- when the player is hit
 function p.hit()
-	p.hp -= 1
+	p.hp -= 2
 	p.score -= 2	
 	
 	-- provide 2 seconds of
@@ -258,6 +267,8 @@ function p.hit()
 	p.col = 13
 	p.invtimer = 0
 	p.runtimer = true
+	
+	sfx(58,-1)
 end
 
 function p.spawnfriends()
@@ -279,12 +290,18 @@ function p.death()
 		p.hiscore = p.score
 	end
 	
-	p.xp += p.score/2
+	if p.score < 0 then
+		p.score = 0
+	end
+	
+	p.xp += p.score
 	
 	save()
 	
 	m.u = true
 	m.d = true
+	
+	m.pos = 1
 end
 
 function p.draw()
@@ -443,15 +460,21 @@ function b.death()
 	p.score += 100
 	
 	if p.score > p.hiscore then
-		p.score = p.hiscore
+		p.hiscore = p.score
 	end
 	
-	p.xp += p.score/2
+	if p.score < 0 then
+		p.score = 0
+	end
+	
+	p.xp += p.score
 	
 	save()
 	
 	m.u = true
 	m.d = true
+	
+	m.pos = 1
 end
 
 function b.draw()
@@ -506,6 +529,7 @@ function b.update()
 					2
 				)
 				add(cubes, en)
+				sfx(57)
 			end
 			
 			b.atk = false
@@ -523,6 +547,8 @@ function b.update()
 			
 			b.atk = false
 			b.atktimer = 0
+			
+			sfx(56,-1)
 		elseif rand < .7 then
 			b.timermax = 72
 			
@@ -541,6 +567,8 @@ function b.update()
 			
 			b.atk = false
 			b.atktimer = 0
+			
+			sfx(56,-1)
 		elseif rand < .9 then
 			b.timermax = 72
 			local cnt = randr(2,4)
@@ -559,6 +587,8 @@ function b.update()
 			
 			b.atk = false
 			b.atktimer = 0
+			
+			sfx(56,-1)
 		elseif rand < 1 then
 			b.timermax = 72
 			
@@ -600,6 +630,9 @@ function b.update()
 		
 			b.atk = false
 			b.atktimer = 0
+			
+			sfx(56,-1)
+			sfx(57,-1)
 		end
 	end
 	
@@ -642,7 +675,8 @@ function b.update()
 					b.col = 5
 					b.invtimer = 0
 					b.runinvtimer = true
-					p.score += 4
+					p.score += p.dmg
+					sfx(59,-1)
 					break
 				end
 				if hit then break end
@@ -684,33 +718,33 @@ function m.update()
 	if btnp(4) or btnp(5) then
 		if m.pos == 1 then
 			if p.xp >= p.hpcost then
-				p.mhp += 1
+				p.mhp += 2
 				p.xp -= p.hpcost
-				p.hpcost *= 1.5
+				p.hpcost=flr(p.hpcost*1.5)
 			end
 		elseif m.pos == 2 then
 			if p.xp >= p.stcost then
 				p.mst += 1
 				p.xp -= p.stcost
-				p.stcost *= 1.5
+				p.stcost=flr(p.stcost*1.5)
 			end
 		elseif m.pos == 3 then
 			if p.xp >= p.spdcost then
-				p.maxspeed += .05
+				p.maxspeed += .075
 				p.xp -= p.spdcost
-				p.spdcost *= 1.5
+				p.spdcost=flr(p.spdcost*1.5)
 			end
 		elseif m.pos == 4 then
 			if p.xp >= p.fccost then
 				p.fc += 1
 				p.xp -= p.fccost
-				p.fccost *= 1.5
+				p.fccost=flr(p.fccost*1.5)
 			end
 		elseif m.pos == 5 then
 			if p.xp >= p.dmgcost then
 				p.dmg += 1
 				p.xp -= p.dmgcost
-				p.dmgcost *= 1.5
+				p.dmgcost=flr(p.dmgcost*1.5)
 			end
 		elseif 
 			m.pos == m.itemcount
@@ -798,11 +832,28 @@ function m.draw()
 	pset(76,116,0)
 	pset(76,126,0)
 	
-	--[[
-	debug - center x and y
-	line(64,0,64,128,8)
-	line(0,64,128,64,8)
-	]]
+	-- reset active cubes
+	cubes = {}
+	
+	-- reset player/boss positions
+	p.x = 64
+	p.y = 96
+	b.x = 64
+	b.y = 35
+	
+	-- reset boss state
+	b.hp = b.mhp
+	b.inv = false
+	b.atk = false
+	
+	-- reset player state
+	p.inv = false
+	p.st = p.mst
+	p.dx = 0
+	p.dy = 0
+	
+	-- reset friend spawn timer
+	ft = 1
 end
 
 -->8
@@ -1231,7 +1282,10 @@ __sfx__
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-001000000c0000b000090000700006000050000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0105000030550185511f0051c0052a005270052500522005210051f0051d0051c0051a00518005150051500500005000050000500005000050000500005000050000500005000050000500005000050000500005
+010600000005002051040510505107051090510b0510c05501000020000200003000040000600007000080000a0000b0000d0000e0000f0001100013000140001600017000190001b0001d0001e0001f00021000
+010500000c6510c6510c6510000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+010300000c0500b0510905107051050510405102051000550000002000040000500007000090000b0000c00001000020000200003000040000600007000080000a0000b0000d0000e0000f000110001300014000
 __music__
 00 00414344
 00 00014344
