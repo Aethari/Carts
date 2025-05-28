@@ -3,10 +3,10 @@ This document contains a list of "pseudo game design documents" that help
 outline a game's focus and design.
 
 ### Table of Contents
-1. [Untitled soulslike game](#1.-Untitled-soulslike-game)
+1. [GeoBattle](#1.-GeoBattle)
 
-# 1. Untitled soulslike game
-Cart: [souls.p8](souls.p8)
+# 1. GeoBattle
+Cart: [geo.p8](geo.p8)
 
 ## Game Summary
 The player spawns in an arena. After a few seconds, a boss appears and
