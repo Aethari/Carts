@@ -7,6 +7,9 @@ Cart (and other) releases can be found at [my itch.io page](https://aethari.itch
 ## Game Info
 See [Design.md](Design.md) for the design of specific carts.
 
+## Releases
+- GeoBattle: [https://aethari.itch.io/geobattle](https://aethari.itch.io/geobattle)
+
 ## License
 All carts in this project are licensed under the MIT License.  
 See [LICENSE.txt](LICENSE.txt) for more info.
