@@ -7,6 +7,7 @@ outline a game's focus and design.
 
 # 1. GeoBattle
 Cart: [geo.p8](geo.p8)
+Release: [https://aethari.itch.io/geobattle](https://aethari.itch.io/geobattle)
 
 ## Game Summary
 The player spawns in an arena. After a few seconds, a boss appears and
